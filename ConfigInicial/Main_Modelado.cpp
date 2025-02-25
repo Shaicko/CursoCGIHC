@@ -1,7 +1,7 @@
 /*
 Práctica 4: Modelado Geométrico
 Leonardo Ariel Berdejo Guzmán
-28 febrero 2025
+24 febrero 2025
 318034320
 */
 #include<iostream>
