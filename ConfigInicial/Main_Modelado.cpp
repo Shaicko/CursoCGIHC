@@ -1,7 +1,7 @@
 /*
 Práctica 4: Modelado Geométrico
 Leonardo Ariel Berdejo Guzmán
-24 febrero 2025
+27 febrero 2025
 318034320
 */
 #include<iostream>
@@ -189,19 +189,19 @@ int main() {
 		-0.5f,  0.5f,-0.5f, 1.0f, 1.0f,1.0f,
 		-0.5f, -0.5f,-0.5f, 1.0f, 1.0f,1.0f,
 
-		 0.5f, -0.5f,  0.5f,  1.0f, 1.0f,1.0f,//Right
-		 0.5f, -0.5f, -0.5f,  1.0f, 1.0f,1.0f,
-		 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,1.0f,
-		 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,1.0f,
-		 0.5f,  0.5f,  0.5f,  1.0f, 1.0f,1.0f,
-		 0.5f,  -0.5f, 0.5f, 1.0f, 1.0f,1.0f,
+		 0.5f, -0.5f,  0.5f,  0.86, 0.86, 0.86,//Right
+		 0.5f, -0.5f, -0.5f,  0.86, 0.86, 0.86,
+		 0.5f,  0.5f, -0.5f,  0.86, 0.86, 0.86,
+		 0.5f,  0.5f, -0.5f,  0.86, 0.86, 0.86,
+		 0.5f,  0.5f,  0.5f,  0.86, 0.86, 0.86,
+		 0.5f,  -0.5f, 0.5f, 0.86, 0.86, 0.86,
 
-		-0.5f,  0.5f,  0.5f,  1.0f, 1.0f,1.0f,//Left
-		-0.5f,  0.5f, -0.5f,  1.0f, 1.0f,1.0f,
-		-0.5f, -0.5f, -0.5f,  1.0f, 1.0f,1.0f,
-		-0.5f, -0.5f, -0.5f,  1.0f, 1.0f,1.0f,
-		-0.5f, -0.5f,  0.5f,  1.0f, 1.0f,1.0f,
-		-0.5f,  0.5f,  0.5f,  1.0f, 1.0f,1.0f,
+		-0.5f,  0.5f,  0.5f,  0.86, 0.86, 0.86,//Left
+		-0.5f,  0.5f, -0.5f,  0.86, 0.86, 0.86,
+		-0.5f, -0.5f, -0.5f,  0.86, 0.86, 0.86,
+		-0.5f, -0.5f, -0.5f,  0.86, 0.86, 0.86,
+		-0.5f, -0.5f,  0.5f,  0.86, 0.86, 0.86,
+		-0.5f,  0.5f,  0.5f,  0.86, 0.86, 0.86,
 
 		-0.5f, -0.5f, -0.5f, 1.0f, 1.0f,1.0f,//Bottom
 		0.5f, -0.5f, -0.5f,  1.0f, 1.0f,1.0f,
@@ -225,7 +225,6 @@ int main() {
 	GLuint VBOVerde, VAOVerde;
 	glGenVertexArrays(1, &VAOVerde);
 	glGenBuffers(1, &VBOVerde);
-	//glGenBuffers(1, &EBO);
 
 	// Enlazar  Vertex Array Object
 	glBindVertexArray(VAOVerde);
@@ -233,11 +232,6 @@ int main() {
 	//2.- Copiamos nuestros arreglo de vertices en un buffer de vertices para que OpenGL lo use
 	glBindBuffer(GL_ARRAY_BUFFER, VBOVerde);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(verticesVerde), verticesVerde, GL_STATIC_DRAW);
-	// 3.Copiamos nuestro arreglo de indices en  un elemento del buffer para que OpenGL lo use
-	/*glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);*/
-
-	// 4. Despues colocamos las caracteristicas de los vertices
 
 	// Posicion
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)0);
@@ -308,15 +302,13 @@ int main() {
 		glUniformMatrix4fv(projecLoc, 1, GL_FALSE, glm::value_ptr(projection));
 		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-	
 
-		glBindVertexArray(VAOVerde);
-		
+			
 		//Cuerpo verde
+		glBindVertexArray(VAOVerde);
 		model = glm::mat4(1.0f);
 		model = glm::scale(model, glm::vec3(4.0f, 4.0f, 3.0f)); // Ancho, grosor, profundidad
 		model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // Posición del cuerpo
-		//model = glm::rotate(model, glm::radians(180.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 
