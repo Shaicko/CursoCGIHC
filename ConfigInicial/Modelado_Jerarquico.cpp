@@ -1,7 +1,7 @@
 /*
 Práctica 5: Modelado Jerárquico
 Leonardo Ariel Berdejo Guzmán
-03 marzo 2025
+05 marzo 2025
 318034320
 */
 #include<iostream>
@@ -375,8 +375,8 @@ int main() {
 
 	//Dedo5
 		//Model Dedo5 A
-		model = glm::translate(modelTemp2, glm::vec3(0.25f, -0.3828125, 0.0f));//me muevo al final de la caja para dibujar la otra caja
-		model = glm::rotate(model, glm::radians(dedo13), glm::vec3(0.0f, 0.0f, 1.0f)); //dedo5 A
+		model = glm::translate(modelTemp2, glm::vec3(0.25f, -0.3828125, 0.3828125));//me muevo al final de la caja para dibujar la otra caja
+		model = glm::rotate(model, glm::radians(dedo13), glm::vec3(0.0f, 1.0f, 0.0f)); //dedo5 A
 		modelTemp = model = glm::translate(model, glm::vec3(0.25f, 0.0f, 0.0f));//para ubicarse en el centro de la figura a dibujar
 		model = glm::scale(model, glm::vec3(0.5f, 0.234375f, 0.234375f));//dibujo caja
 		color = glm::vec3(0.0f, 1.0f, 1.0f);//coloreo de cyan
@@ -386,9 +386,9 @@ int main() {
 
 		//Model Dedo5 B
 		model = glm::translate(modelTemp, glm::vec3(0.25f, 0.0f, 0.0f));//me muevo al final de la caja para dibujar la otra caja
-		model = glm::rotate(model, glm::radians(dedo14), glm::vec3(0.0f, 0.0f, 1.0f)); //dedo5 B
-		modelTemp = model = glm::translate(model, glm::vec3(0.25f, 0.0f, 0.0f));//para ubicarse en el centro de la figura a dibujar
-		model = glm::scale(model, glm::vec3(0.5f, 0.234375f, 0.234375f));//dibujo caja
+		model = glm::rotate(model, glm::radians(dedo14), glm::vec3(0.0f, 1.0f, 0.0f)); //dedo5 B
+		modelTemp = model = glm::translate(model, glm::vec3(0.125f, 0.0f, 0.0f));//para ubicarse en el centro de la figura a dibujar
+		model = glm::scale(model, glm::vec3(0.25f, 0.234375f, 0.234375f));//dibujo caja
 		color = glm::vec3(1.0f, 0.0f, 1.0f);//coloreo de magenta
 		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
