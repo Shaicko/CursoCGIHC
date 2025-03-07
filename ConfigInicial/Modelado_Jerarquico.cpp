@@ -465,10 +465,10 @@ int main() {
 		 dedo4 += 0.2f;
 		 dedo7 += 0.3f;
 		 dedo10 += 0.4f;
-		 if (dedo1 > 6.0f) dedo1 = 6.0f; //dedo1 no puede ser mayor a 0°
-		 if (dedo4 > 6.0f) dedo4 = 6.0f; //dedo4 no puede ser mayor a 0°
-		 if (dedo7 > 6.0f) dedo7 = 6.0f; //dedo7 no puede ser mayor a 0°
-		 if (dedo10 > 6.0f) dedo10 = 6.0f; //dedo10 no puede ser mayor a 0°
+		 if (dedo1 > 6.0f) dedo1 = 6.0f; //dedo1 no puede ser mayor a 6°
+		 if (dedo4 > 6.0f) dedo4 = 6.0f; //dedo4 no puede ser mayor a 6°
+		 if (dedo7 > 6.0f) dedo7 = 6.0f; //dedo7 no puede ser mayor a 6°
+		 if (dedo10 > 6.0f) dedo10 = 6.0f; //dedo10 no puede ser mayor a 6°
 	 }
 	 if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS) {
 		 dedo1 -= 0.1f;
