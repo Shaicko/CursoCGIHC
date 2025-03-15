@@ -1,7 +1,7 @@
 /*
 Práctica 6: Carga de modelos y camara sintetica
 Leonardo Ariel Berdejo Guzmán
-08 marzo 2025
+14 marzo 2025
 318034320
 */
 
@@ -29,7 +29,7 @@ Leonardo Ariel Berdejo Guzmán
 #include "stb_image.h"
 
 // Properties
-const GLuint WIDTH = 800, HEIGHT = 600; //const GLuint WIDTH = 1200, HEIGHT = 800;
+const GLuint WIDTH = 1200, HEIGHT = 800;
 int SCREEN_WIDTH, SCREEN_HEIGHT;
 
 // Function prototypes
@@ -103,6 +103,12 @@ int main( )
     // Load models
 	Model dog((char*)"Models/RedDog.obj");//Ruta del perro 3D del previo
 	Model bird((char*)"Models/12213_Bird_v1_l3.obj");//Ruta del pajaro 3D
+	Model beachBall((char*)"Models/13517_Beach_Ball_v2_L3.obj");//Ruta del balon de playa 3D
+	Model duck((char*)"Models/12248_Bird_v1_L2.obj");//Ruta del pato 3D
+    Model barril((char*)"Models/WoodenBarrel.obj");//Ruta del barril 3D
+	Model island((char*)"Models/isla.obj");//Ruta de la isla 3D
+	Model sun((char*)"Models/Sun.obj");//Ruta del sol 3D
+	Model palmTree((char*)"Models/palmTree.obj");//Ruta de la palma 3D
     glm::mat4 projection = glm::perspective( camera.GetZoom( ), ( float )SCREEN_WIDTH/( float )SCREEN_HEIGHT, 0.1f, 100.0f );
     
   
@@ -129,23 +135,59 @@ int main( )
         glUniformMatrix4fv(glGetUniformLocation(shader.Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
         glUniformMatrix4fv(glGetUniformLocation(shader.Program, "view"), 1, GL_FALSE, glm::value_ptr(view));
 
-        // Draw the loaded model
+        // Draw the loaded model gg
         glm::mat4 model(1);
-        glUniformMatrix4fv(glGetUniformLocation(shader.Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
-		dog.Draw(shader);
-
-		model = glm::translate(model, glm::vec3(3.0f, 0.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(2.0f, 2.0f, 2.0f));
+        glm::mat4 modelTemp = glm::mat4(1.0f); //Temp
+        glm::mat4 modelTemp2 = glm::mat4(1.0f); //Temp
+        modelTemp = model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
 		glUniformMatrix4fv(glGetUniformLocation(shader.Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
 		dog.Draw(shader);
 
-		//Dibujo del modelo del pajaro
-		glm::mat4 modelBird(1);
-        modelBird = glm::rotate(modelBird, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-        modelBird = glm::translate(modelBird, glm::vec3(0.0f, 0.03f, 0.11f));
-        modelBird = glm::scale(modelBird, glm::vec3(0.02f, 0.02f, 0.02f));
-		glUniformMatrix4fv(glGetUniformLocation(shader.Program, "model"), 1, GL_FALSE, glm::value_ptr(modelBird));
+	    //Dibujo del modelo del pajaro	gg	
+        model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+        model = glm::translate(model, glm::vec3(0.0f, 0.03f, 0.11f));
+        model = glm::scale(model, glm::vec3(0.02f, 0.02f, 0.02f));
+		glUniformMatrix4fv(glGetUniformLocation(shader.Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
 		bird.Draw(shader);
+
+        //Dibujo de la isla (1)gg
+		model = glm::translate(modelTemp, glm::vec3(0.0f, -0.75f, 0.0f));
+        model = glm::scale(model, glm::vec3(0.3, 0.3f, 0.3f));
+		glUniformMatrix4fv(glGetUniformLocation(shader.Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
+		island.Draw(shader);
+
+        //Dibujo del modelo del barril (2)gg
+        modelTemp2 = model = glm::translate(modelTemp, glm::vec3(-2.0f, -0.39f, 0.0f));        
+        model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
+        glUniformMatrix4fv(glGetUniformLocation(shader.Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
+        barril.Draw(shader);
+
+        //Dibujo del modelo del pato (3)gg
+		model = glm::translate(modelTemp2, glm::vec3(0.0f, 0.712f, 0.0f));
+		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::scale(model, glm::vec3(0.01f, 0.01f, 0.01f));
+		glUniformMatrix4fv(glGetUniformLocation(shader.Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
+		duck.Draw(shader);
+        
+		//Dibujo del modelo del balon de playa (4)gg
+        model = glm::translate(modelTemp, glm::vec3(1.0f, -0.25f, 1.0f));
+		model = glm::scale(model, glm::vec3(0.01f, 0.01f, 0.01f));
+		glUniformMatrix4fv(glGetUniformLocation(shader.Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
+		beachBall.Draw(shader);
+
+        //Dibujo del sol (5)gg
+		model = glm::translate(modelTemp2, glm::vec3(-5.0f, 5.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(0.5f, 0.5f, 0.5f));
+		glUniformMatrix4fv(glGetUniformLocation(shader.Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
+		sun.Draw(shader);
+
+		//Dibujo de la palma (6)gg
+		model = glm::translate(modelTemp, glm::vec3(9.0f, 0.0f, -2.0f));
+		model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));
+		glUniformMatrix4fv(glGetUniformLocation(shader.Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
+		palmTree.Draw(shader);
 
         // Swap the buffers
         glfwSwapBuffers( window );

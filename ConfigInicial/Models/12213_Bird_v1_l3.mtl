@@ -12,6 +12,6 @@ newmtl 12213_bird
 	Kd 1.0000 1.0000 1.0000
 	Ks 0.0000 0.0000 0.0000
 	Ke 0.0000 0.0000 0.0000
-	map_Ka 12213_bird_diffuse.jpg
-	map_Kd 12213_bird_diffuse.jpg
+	map_Ka Texturas/12213_bird_diffuse.jpg
+	map_Kd Texturas/12213_bird_diffuse.jpg
 	map_bump Map__7_Normal Bump.jpg
