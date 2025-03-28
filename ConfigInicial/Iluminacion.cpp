@@ -38,7 +38,7 @@ float moonRotate = 90.0f;
 float sunRotate = 90.0f;
 
 //Radio de la órbita del sol y la luna
-float radius = 10.0f;
+float radius = 6.0f;
 
 // Function prototypes
 void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode);
@@ -55,7 +55,7 @@ bool firstMouse = true;
 
 // Light attributes
 glm::vec3 lightPos(radius* cos(glm::radians(sunRotate)), radius* sin(glm::radians(sunRotate)), 0.0f);
-glm::vec3 newLightPos(radius* cos(glm::radians(moonRotate)), radius* sin(glm::radians(moonRotate)), 0.0f);
+glm::vec3 newlightPos(radius* cos(glm::radians(moonRotate)), radius* sin(glm::radians(moonRotate)), 0.0f);
 
 float movelightPos = 0.0f;
 GLfloat deltaTime = 0.0f;
@@ -292,25 +292,37 @@ int main()
 		//Configuracion de las luces
         lightingShader.Use();
         GLint lightPosLoc = glGetUniformLocation(lightingShader.Program, "light.position");
-        GLint newlightPosLoc = glGetUniformLocation(lightingShader.Program, "newLight.position");
+        GLint newlightPosLoc = glGetUniformLocation(lightingShader.Program, "newlight.position");
         GLint viewPosLoc = glGetUniformLocation(lightingShader.Program, "viewPos");
 
 
         // Envía las posiciones de las luces
         glUniform3f(glGetUniformLocation(lightingShader.Program, "light.position"), lightPos.x, lightPos.y, lightPos.z);
-        glUniform3f(glGetUniformLocation(lightingShader.Program, "newLight.position"), newLightPos.x, newLightPos.y, newLightPos.z);
+        glUniform3f(glGetUniformLocation(lightingShader.Program, "newlight.position"), newlightPos.x, newlightPos.y, newlightPos.z);
 
         // Envía las propiedades de las luces (ambient, diffuse, specular)
+        if (day) {
+            //día - luz solar brillante, luna apagada
+            glUniform3f(glGetUniformLocation(lightingShader.Program, "light.ambient"), 0.7f, 0.7f, 0.75f);   // Luz ambiental más fuerte
+            glUniform3f(glGetUniformLocation(lightingShader.Program, "light.diffuse"), 1.7f, 1.6f, 1.5f);   // Luz solar directa intensísima
+            glUniform3f(glGetUniformLocation(lightingShader.Program, "light.specular"), 1.2f, 1.2f, 1.2f);  // Reflexión más fuerte
 
-        //día - luz solar brillante
-        glUniform3f(glGetUniformLocation(lightingShader.Program, "light.ambient"), 0.7f, 0.7f, 0.75f);   // Luz ambiental más fuerte
-        glUniform3f(glGetUniformLocation(lightingShader.Program, "light.diffuse"), 2.2f, 2.1f, 2.0f);   // Luz solar directa intensísima
-        glUniform3f(glGetUniformLocation(lightingShader.Program, "light.specular"), 1.2f, 1.2f, 1.2f);  // Reflexión más fuerte
+            // Apagar la luz de la luna completamente
+            glUniform3f(glGetUniformLocation(lightingShader.Program, "newlight.ambient"), 0.0f, 0.0f, 0.0f);
+            glUniform3f(glGetUniformLocation(lightingShader.Program, "newlight.diffuse"), 0.0f, 0.0f, 0.0f);
+            glUniform3f(glGetUniformLocation(lightingShader.Program, "newlight.specular"), 0.0f, 0.0f, 0.0f);
+        }
+        else if (night) {
+            // Apagar la luz del sol completamente
+            glUniform3f(glGetUniformLocation(lightingShader.Program, "light.ambient"), 0.0f, 0.0f, 0.0f);
+            glUniform3f(glGetUniformLocation(lightingShader.Program, "light.diffuse"), 0.0f, 0.0f, 0.0f);
+            glUniform3f(glGetUniformLocation(lightingShader.Program, "light.specular"), 0.0f, 0.0f, 0.0f);
 
-        //noche - luz de luna llena más visible y azulada
-        glUniform3f(glGetUniformLocation(lightingShader.Program, "newLight.ambient"), 0.3f, 0.3f, 0.5f);   // Luz ambiental azulada
-        glUniform3f(glGetUniformLocation(lightingShader.Program, "newLight.diffuse"), 1.0f, 1.0f, 1.5f);   // Luz difusa lunar más azulada
-        glUniform3f(glGetUniformLocation(lightingShader.Program, "newLight.specular"), 1.2f, 1.2f, 1.8f);  // Reflexión lunar más pronunciada
+            //noche - luz de luna llena más visible y azulada
+            glUniform3f(glGetUniformLocation(lightingShader.Program, "newlight.ambient"), 0.5f, 0.5f, 0.8f);   // Luz ambiental azulada
+            glUniform3f(glGetUniformLocation(lightingShader.Program, "newlight.diffuse"), 1.2f, 1.2f, 1.8f);   // Luz difusa lunar más azulada
+            glUniform3f(glGetUniformLocation(lightingShader.Program, "newlight.specular"), 1.5f, 1.5f, 1.8f);  // Reflexión lunar más pronunciada
+        }
 
         // Envía la posición de la cámara
         glUniform3f(glGetUniformLocation(lightingShader.Program, "viewPos"), camera.GetPosition().x, camera.GetPosition().y, camera.GetPosition().z);
@@ -327,7 +339,7 @@ int main()
         }
         else if (night) {
             // Configuración para el día (Sol)
-            newLightPos = glm::vec3(radius * cos(glm::radians(moonRotate)), radius * sin(glm::radians(moonRotate)), 0.0f);
+            newlightPos = glm::vec3(radius * cos(glm::radians(moonRotate)), radius * sin(glm::radians(moonRotate)), 0.0f);
             glUniform3f(glGetUniformLocation(lightingShader.Program, "material.ambient"), 0.1f, 0.1f, 0.2f);
             glUniform3f(glGetUniformLocation(lightingShader.Program, "material.diffuse"), 0.2f, 0.2f, 0.3f);
             glUniform3f(glGetUniformLocation(lightingShader.Program, "material.specular"), 0.3f, 0.3f, 0.4f);
@@ -407,8 +419,8 @@ int main()
             float xPos = radius * cos(glm::radians(moonRotate));
             float yPos = radius * sin(glm::radians(moonRotate));
 
-            modelMoon = glm::translate(modelMoon, glm::vec3(xPos, yPos, 0.0f));
-            modelMoon = glm::rotate(modelMoon, glm::radians(moonRotate), glm::vec3(0.0f, 1.0f, 0.0f));
+            modelMoon = glm::translate(modelMoon, glm::vec3(xPos, yPos, 0.0f)); // Traslación para mover el sol en un arco
+            modelMoon = glm::rotate(modelMoon, glm::radians(moonRotate), glm::vec3(0.0f, 1.0f, 0.0f)); // Rotación alrededor del eje Y
             modelMoon = glm::scale(modelMoon, glm::vec3(0.3f)); // Escala el modelo
 
             glUniformMatrix4fv(glGetUniformLocation(lampshader.Program, "model"), 1, GL_FALSE, glm::value_ptr(modelMoon));
@@ -417,6 +429,7 @@ int main()
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, moonTexture);
             glUniform1i(glGetUniformLocation(lampshader.Program, "material.diffuse"), 0);
+			//Dibujo del modelo de luna
             moon.Draw(lampshader);
             glBindVertexArray(0);
         }
@@ -428,13 +441,10 @@ int main()
             float xPos = radius * cos(glm::radians(sunRotate));
             float yPos = radius * sin(glm::radians(sunRotate));
 
-            // Traslación para mover el sol en un arco
-            modelSun = glm::translate(modelSun, glm::vec3(xPos, yPos, 0.0f));
-
-            // Rotación alrededor del eje Y
-            modelSun = glm::rotate(modelSun, glm::radians(sunRotate), glm::vec3(0.0f, 1.0f, 0.0f));
-
+            modelSun = glm::translate(modelSun, glm::vec3(xPos, yPos, 0.0f)); // Traslación para mover el sol en un arco
+            modelSun = glm::rotate(modelSun, glm::radians(sunRotate), glm::vec3(0.0f, 1.0f, 0.0f)); // Rotación alrededor del eje Y
             modelSun = glm::scale(modelSun, glm::vec3(0.3f)); // Escala el modelo
+
             glUniformMatrix4fv(glGetUniformLocation(lampshader.Program, "model"), 1, GL_FALSE, glm::value_ptr(modelSun));
             glBindVertexArray(VAO);
             //aplicando textura
@@ -513,7 +523,7 @@ void DoMovement()
         }
     }
 
-    // También puedes añadir esto para verificar que las variables se actualizan:
+    // Para verificar que las variables se actualizan:
     if (keys[GLFW_KEY_L] || keys[GLFW_KEY_O]) {
         std::cout << "Sun rotation: " << sunRotate << ", Moon rotation: " << moonRotate << std::endl;
     }
@@ -539,14 +549,14 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode
         }
     }
 
-    //Botón M y N para cambiar entre día y noche
-    if (keys[GLFW_KEY_M])
+    //Botón J y K para cambiar entre día y noche
+    if (keys[GLFW_KEY_J])
     {
         night = true;
         day = false;
     }
 
-    if (keys[GLFW_KEY_N])
+    if (keys[GLFW_KEY_K])
     {
         night = false;
         day = true;
