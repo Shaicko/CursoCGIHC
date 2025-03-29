@@ -223,12 +223,13 @@ int main()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST_MIPMAP_NEAREST);
 
-    //Textura para la luna
+    //Textura para la Luna
     GLuint moonTexture;
     glGenTextures(1, &moonTexture);
     glBindTexture(GL_TEXTURE_2D, moonTexture);
 
     stbi_set_flip_vertically_on_load(true);
+	// Cargar la textura de la Luna
     image = stbi_load("Models/Texturas/pedra-166.jpg", &textureWidth, &textureHeight, &nrChannels, 0);
 
     if (image)
@@ -248,7 +249,7 @@ int main()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST_MIPMAP_NEAREST);
 
-    // Cargar textura para el Sol
+    //Textura para el Sol
     GLuint sunTexture;
     glGenTextures(1, &sunTexture);
     glBindTexture(GL_TEXTURE_2D, sunTexture);
@@ -412,7 +413,7 @@ int main()
         // Envía la posición de la cámara al shader
         glUniform3f(viewPosLoc, camera.GetPosition().x, camera.GetPosition().y, camera.GetPosition().z);
 
-        //dibujo de luz LUNA (1)
+        //Dibujo de luz LUNA (1)
         if (night) {
             glm::mat4 modelMoon(1);
             // Calcula la posición en el arco basado en moonRotate
