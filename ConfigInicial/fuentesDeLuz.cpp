@@ -66,6 +66,7 @@ glm::vec3 pointLightPositions[] = {
 	glm::vec3(0.0f, 0.0f, 0.0f)     // Moscow lamp position
 };
 
+// Point light colors
 float vertices[] = {
 	 -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
 		0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
@@ -197,8 +198,7 @@ int main()
 	Model palmTree((char*)"Models/palmTree.obj");//Ruta de la palma 3D
 	//Modelos de las luces
 	Model mushroom((char*)"Models/mushroom.obj");//Ruta del hongo 3D
-	Model moscowLamp((char*)"Models/moscowLamp.obj");//Ruta de la lampara 3D
-	//Model lampE((char*)"Models/lampExterior.obj");//Ruta del poste de luz 3D
+	Model lampE((char*)"Models/lampExterior.obj");//Ruta la lámpara 3D
 	Model candle((char*)"Models/candle.obj");//Ruta de la vela 3D
 
 
@@ -388,6 +388,7 @@ int main()
 		//Dibujo de modelos
 		// Draw the loaded model gg
 		glm::mat4 model(1);
+
 		glm::mat4 modelTemp = glm::mat4(1.0f); //Temp
 		glm::mat4 modelTemp2 = glm::mat4(1.0f); //Temp
 		modelTemp = model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
@@ -397,6 +398,7 @@ int main()
 		red_dog.Draw(lightingShader);
 
 		//Dibujo del modelo del pajaro	gg	
+		
 		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 		model = glm::translate(model, glm::vec3(0.0f, 0.03f, 0.11f));
 		model = glm::scale(model, glm::vec3(0.02f, 0.02f, 0.02f));
@@ -458,39 +460,33 @@ int main()
 		// Set matrices
 		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
 		glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
-		model = glm::mat4(1);
-		model = glm::translate(model, glm::vec3(5.0f, 6.0f, 1.0f));
-		model = glm::translate(model, lightPos);
-		model = glm::scale(model, glm::vec3(0.8f)); // Make it a smaller cube
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		//model = glm::mat4(1);
+		//model = glm::translate(model, glm::vec3(5.0f, 6.0f, 1.0f));
+		//model = glm::translate(model, lightPos);
+		//model = glm::scale(model, glm::vec3(0.8f)); // Make it a smaller cube
+		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 
 		// Draw the light object (using light's vertex attributes)
-		glBindVertexArray(VAO);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
-		glBindVertexArray(0);
-
 			// For mushroom			
-			model = glm::translate(modelTemp2, glm::vec3(0.3f, 0.3f, -0.1f));
+			modelTemp2 = model = glm::translate(modelTemp2, glm::vec3(0.3f, 0.3f, -0.1f));
 			model = glm::scale(model, glm::vec3(0.1f));
-			model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f)); //Rotación del foco
+			//model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f)); //Rotación del foco
 			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 			mushroom.Draw(lampShader);
 		
-			//// For candle
-			//model = glm::mat4(1);
-			//model = glm::translate(model, pointLightPositions[1]);
-			//model = glm::scale(model, glm::vec3(0.1f));
-			//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-			//candle.Draw(lampShader);
+			// For candle			
+			modelTemp = model = glm::translate(modelTemp2, glm::vec3(-3.1f, -0.43f, -0.42f));
+			model = glm::scale(model, glm::vec3(0.1f));
+			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+			candle.Draw(lampShader);
 		
-			//// For Moscow lamp
-			//model = glm::mat4(1);
-			//model = glm::translate(model, pointLightPositions[2]);
-			//model = glm::scale(model, glm::vec3(0.1f));
-			//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-			//moscowLamp.Draw(lampShader);
-			///*glBindVertexArray(VAO);
-			//glDrawArrays(GL_TRIANGLES, 0, 36);*/
+			// For Moscow lamp			
+			model = glm::translate(modelTemp, glm::vec3(0.0f, 0.3f, -2.0f));
+			model = glm::scale(model, glm::vec3(0.05f));
+			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+			lampE.Draw(lampShader);
+			/*glBindVertexArray(VAO);
+			glDrawArrays(GL_TRIANGLES, 0, 36);*/
 		
 		glBindVertexArray(0);
 
