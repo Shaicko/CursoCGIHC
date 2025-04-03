@@ -61,9 +61,9 @@ bool active;
 
 // Positions of the point lights
 glm::vec3 pointLightPositions[] = {
-	glm::vec3(1.3f, 0.05f, 0.9f),     // Mushroom position
-	glm::vec3(0.0f, 0.0f, 0.0f),    // Candle position
-	glm::vec3(0.0f, 0.0f, 0.0f)     // Moscow lamp position
+	glm::vec3(1.3f, 0.2f, 0.9f),     // Mushroom position
+	glm::vec3(-1.8f, -0.1f, 0.47f),    // Candle position
+	glm::vec3(0.19f, -0.2f, -1.51f)     // Lamp position
 };
 
 // Point light colors
@@ -481,12 +481,41 @@ int main()
 			candle.Draw(lampShader);
 		
 			// For Moscow lamp			
-			model = glm::translate(modelTemp, glm::vec3(0.0f, 0.3f, -2.0f));
+			model = glm::translate(modelTemp, glm::vec3(2.0f, 0.1f, -2.0f));
 			model = glm::scale(model, glm::vec3(0.05f));
 			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 			lampE.Draw(lampShader);
-			/*glBindVertexArray(VAO);
-			glDrawArrays(GL_TRIANGLES, 0, 36);*/
+
+			// Dibuja cubos blancos en las posiciones de las luces para facilitar su visualización
+			glBindVertexArray(VAO); // Usa el VAO que ya tienes para los vértices del cubo
+
+			// Configura un shader básico para dibujar los cubos con un color sólido
+			lightingShader.Use();
+
+			// Para el cubo de la luz 1 (Mushroom)
+			model = glm::mat4(1);
+			model = glm::translate(model, pointLightPositions[0]);
+			model = glm::scale(model, glm::vec3(0.2f)); // Escala pequeña pero visible
+			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+			// Establece un color blanco brillante para el cubo
+			glUniform3f(glGetUniformLocation(lightingShader.Program, "light.ambient"), 1.0f, 1.0f, 1.0f);
+			glUniform3f(glGetUniformLocation(lightingShader.Program, "light.diffuse"), 1.0f, 1.0f, 1.0f);
+			glUniform3f(glGetUniformLocation(lightingShader.Program, "light.specular"), 1.0f, 1.0f, 1.0f);
+			glDrawArrays(GL_TRIANGLES, 0, 36);
+
+			// Para el cubo de la luz 2 (Candle)
+			model = glm::mat4(1);
+			model = glm::translate(model, pointLightPositions[1]);
+			model = glm::scale(model, glm::vec3(0.2f));
+			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+			glDrawArrays(GL_TRIANGLES, 0, 36);
+
+			// Para el cubo de la luz 3 (Lamp)
+			model = glm::mat4(1);
+			model = glm::translate(model, pointLightPositions[2]);
+			model = glm::scale(model, glm::vec3(0.2f));
+			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+			glDrawArrays(GL_TRIANGLES, 0, 36);
 		
 		glBindVertexArray(0);
 
@@ -562,29 +591,29 @@ void DoMovement()
 	}
 	if (keys[GLFW_KEY_Q])
 	{
-		pointLightPositions[0].x += 0.01f;
+		pointLightPositions[1].x += 0.01f;
 	}
 	if (keys[GLFW_KEY_E])
 	{
-		pointLightPositions[0].x -= 0.01f;
+		pointLightPositions[1].x -= 0.01f;
 	}
 
 	if (keys[GLFW_KEY_P])
 	{
-		pointLightPositions[0].y += 0.01f;
+		pointLightPositions[1].y += 0.01f;
 	}
 
 	if (keys[GLFW_KEY_M])
 	{
-		pointLightPositions[0].y -= 0.01f;
+		pointLightPositions[1].y -= 0.01f;
 	}
 	if (keys[GLFW_KEY_J])
 	{
-		pointLightPositions[0].z -= 0.01f;
+		pointLightPositions[1].z -= 0.01f;
 	}
 	if (keys[GLFW_KEY_K])
 	{
-		pointLightPositions[0].z += 0.01f;
+		pointLightPositions[1].z += 0.01f;
 	}
 	// Cambios para Point light 1 - Focos
 	if (keys[GLFW_KEY_Z]) {
