@@ -56,7 +56,9 @@ GLfloat lastY = HEIGHT / 2.0;
 bool keys[1024];
 bool firstMouse = true;
 // Light attributes
-glm::vec3 lightPos(0.0f, 0.0f, 0.0f);
+glm::vec3 lightPos(radius* cos(glm::radians(sunRotate)), radius* sin(glm::radians(sunRotate)), 0.0f);
+glm::vec3 newlightPos(radius* cos(glm::radians(moonRotate)), radius* sin(glm::radians(moonRotate)), 0.0f);
+
 bool active;
 
 // Positions of the point lights
@@ -300,6 +302,8 @@ int main()
 
 		// Use cooresponding shader when setting uniforms/drawing objects
 		lightingShader.Use();
+		GLint lightPosLoc = glGetUniformLocation(lightingShader.Program, "light.position");
+		GLint newlightPosLoc = glGetUniformLocation(lightingShader.Program, "newlight.position");
 
         glUniform1i(glGetUniformLocation(lightingShader.Program, "diffuse"), 0);
 		//glUniform1i(glGetUniformLocation(lightingShader.Program, "specular"),1);
@@ -307,6 +311,33 @@ int main()
 		GLint viewPosLoc = glGetUniformLocation(lightingShader.Program, "viewPos");
 		glUniform3f(viewPosLoc, camera.GetPosition().x, camera.GetPosition().y, camera.GetPosition().z);
 
+		// Envía las posiciones de las luces
+		glUniform3f(glGetUniformLocation(lightingShader.Program, "light.position"), lightPos.x, lightPos.y, lightPos.z);
+		glUniform3f(glGetUniformLocation(lightingShader.Program, "newlight.position"), newlightPos.x, newlightPos.y, newlightPos.z);
+
+		// Envía las propiedades de las luces (ambient, diffuse, specular)
+		if (day) {
+			//día - luz solar brillante, luna apagada
+			glUniform3f(glGetUniformLocation(lightingShader.Program, "light.ambient"), 0.7f, 0.7f, 0.75f);   // Luz ambiental más fuerte
+			glUniform3f(glGetUniformLocation(lightingShader.Program, "light.diffuse"), 1.7f, 1.6f, 1.5f);   // Luz solar directa intensísima
+			glUniform3f(glGetUniformLocation(lightingShader.Program, "light.specular"), 1.2f, 1.2f, 1.2f);  // Reflexión más fuerte
+
+			// Apagar la luz de la luna completamente
+			glUniform3f(glGetUniformLocation(lightingShader.Program, "newlight.ambient"), 0.0f, 0.0f, 0.0f);
+			glUniform3f(glGetUniformLocation(lightingShader.Program, "newlight.diffuse"), 0.0f, 0.0f, 0.0f);
+			glUniform3f(glGetUniformLocation(lightingShader.Program, "newlight.specular"), 0.0f, 0.0f, 0.0f);
+		}
+		else if (night) {
+			// Apagar la luz del sol completamente
+			glUniform3f(glGetUniformLocation(lightingShader.Program, "light.ambient"), 0.0f, 0.0f, 0.0f);
+			glUniform3f(glGetUniformLocation(lightingShader.Program, "light.diffuse"), 0.0f, 0.0f, 0.0f);
+			glUniform3f(glGetUniformLocation(lightingShader.Program, "light.specular"), 0.0f, 0.0f, 0.0f);
+
+			//noche - luz de luna llena más visible y azulada
+			glUniform3f(glGetUniformLocation(lightingShader.Program, "newlight.ambient"), 0.5f, 0.5f, 0.8f);   // Luz ambiental azulada
+			glUniform3f(glGetUniformLocation(lightingShader.Program, "newlight.diffuse"), 1.2f, 1.2f, 1.8f);   // Luz difusa lunar más azulada
+			glUniform3f(glGetUniformLocation(lightingShader.Program, "newlight.specular"), 1.5f, 1.5f, 1.8f);  // Reflexión lunar más pronunciada
+		}
 
 		// Directional light
 		glUniform3f(glGetUniformLocation(lightingShader.Program, "dirLight.direction"), -0.2f, -1.0f, -0.3f);
@@ -361,7 +392,23 @@ int main()
 		glUniform1f(glGetUniformLocation(lightingShader.Program, "spotLight.outerCutOff"), glm::cos(glm::radians(18.0f)));
 
 		// Set material properties
-		glUniform1f(glGetUniformLocation(lightingShader.Program, "material.shininess"), 16.0f);
+		//Visualizar el día y la noche
+		if (day) {
+			// Materiales que simulan el día
+			lightPos = glm::vec3(radius * cos(glm::radians(sunRotate)), radius * sin(glm::radians(sunRotate)), 0.0f);
+			glUniform3f(glGetUniformLocation(lightingShader.Program, "material.ambient"), 0.5f, 0.5f, 0.4f);
+			glUniform3f(glGetUniformLocation(lightingShader.Program, "material.diffuse"), 0.7f, 0.7f, 0.5f);
+			glUniform3f(glGetUniformLocation(lightingShader.Program, "material.specular"), 0.8f, 0.8f, 0.6f);
+			glUniform1f(glGetUniformLocation(lightingShader.Program, "material.shininess"), 32.0f);
+		}
+		else if (night) {
+			// Configuración para el día (Sol)
+			newlightPos = glm::vec3(radius * cos(glm::radians(moonRotate)), radius * sin(glm::radians(moonRotate)), 0.0f);
+			glUniform3f(glGetUniformLocation(lightingShader.Program, "material.ambient"), 0.1f, 0.1f, 0.2f);
+			glUniform3f(glGetUniformLocation(lightingShader.Program, "material.diffuse"), 0.2f, 0.2f, 0.3f);
+			glUniform3f(glGetUniformLocation(lightingShader.Program, "material.specular"), 0.3f, 0.3f, 0.4f);
+			glUniform1f(glGetUniformLocation(lightingShader.Program, "material.shininess"), 16.0f);
+		}
 
 		// Create camera transformations
 		glm::mat4 view;
@@ -464,6 +511,48 @@ int main()
 		//model = glm::translate(model, lightPos);
 		//model = glm::scale(model, glm::vec3(0.8f)); // Make it a smaller cube
 		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		
+		//Dibujo de luz LUNA (1)
+		if (night) {
+			glm::mat4 modelMoon(1);
+			// Calcula la posición en el arco basado en moonRotate
+			float xPos = radius * cos(glm::radians(moonRotate));
+			float yPos = radius * sin(glm::radians(moonRotate));
+
+			modelMoon = glm::translate(modelMoon, glm::vec3(xPos, yPos, 0.0f)); // Traslación para mover el sol en un arco
+			modelMoon = glm::rotate(modelMoon, glm::radians(moonRotate), glm::vec3(0.0f, 1.0f, 0.0f)); // Rotación alrededor del eje Y
+			modelMoon = glm::scale(modelMoon, glm::vec3(0.3f)); // Escala el modelo
+
+			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(modelMoon));
+			glBindVertexArray(VAO);
+			//aplicando textura de luna
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, moonTexture);
+			glUniform1i(glGetUniformLocation(lampShader.Program, "material.diffuse"), 0);
+			//Dibujo del modelo de luna
+			moon.Draw(lampShader);
+		}
+
+		//Dibujo de luz SOL (2)
+		if (day) {
+			glm::mat4 modelSun(1);
+			// Calcula la posición en el arco basado en sunRotate
+			float xPos = radius * cos(glm::radians(sunRotate));
+			float yPos = radius * sin(glm::radians(sunRotate));
+
+			modelSun = glm::translate(modelSun, glm::vec3(xPos, yPos, 0.0f)); // Traslación para mover el sol en un arco
+			modelSun = glm::rotate(modelSun, glm::radians(sunRotate), glm::vec3(0.0f, 1.0f, 0.0f)); // Rotación alrededor del eje Y
+			modelSun = glm::scale(modelSun, glm::vec3(0.3f)); // Escala el modelo
+
+			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(modelSun));
+			glBindVertexArray(VAO);
+			//aplicando textura
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, sunTexture);
+			glUniform1i(glGetUniformLocation(lampShader.Program, "material.diffuse"), 0);
+			//Dibujo del modelo de sol
+			sun.Draw(lampShader);
+		}
 
 		// Draw the light object (using light's vertex attributes)
 		// For mushroom			
