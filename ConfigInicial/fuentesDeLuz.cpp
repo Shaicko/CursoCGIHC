@@ -315,13 +315,12 @@ int main()
 		glUniform3f(glGetUniformLocation(lightingShader.Program, "light.position"), lightPos.x, lightPos.y, lightPos.z);
 		glUniform3f(glGetUniformLocation(lightingShader.Program, "newlight.position"), newlightPos.x, newlightPos.y, newlightPos.z);
 
-		// Envía las propiedades de las luces (ambient, diffuse, specular)
+        // Envía las propiedades de las luces (ambient, diffuse, specular)
 		if (day) {
-			//día - luz solar brillante, luna apagada
-			glUniform3f(glGetUniformLocation(lightingShader.Program, "light.ambient"), 0.7f, 0.7f, 0.75f);   // Luz ambiental más fuerte
-			glUniform3f(glGetUniformLocation(lightingShader.Program, "light.diffuse"), 1.7f, 1.6f, 1.5f);   // Luz solar directa intensísima
-			glUniform3f(glGetUniformLocation(lightingShader.Program, "light.specular"), 1.2f, 1.2f, 1.2f);  // Reflexión más fuerte
-
+			//día - luz solar amarillenta pero menos intensa
+			glUniform3f(glGetUniformLocation(lightingShader.Program, "light.ambient"), 0.1f, 0.1f, 0.08f);   // Luz ambiental más cálida y suave
+			glUniform3f(glGetUniformLocation(lightingShader.Program, "light.diffuse"), 0.7f, 0.6f, 0.2f);   // Luz solar directa amarillenta pero no tan brillante
+			glUniform3f(glGetUniformLocation(lightingShader.Program, "light.specular"), 0.2f, 0.2f, 0.1f);  // Reflexión más suave y amarillenta
 			// Apagar la luz de la luna completamente
 			glUniform3f(glGetUniformLocation(lightingShader.Program, "newlight.ambient"), 0.0f, 0.0f, 0.0f);
 			glUniform3f(glGetUniformLocation(lightingShader.Program, "newlight.diffuse"), 0.0f, 0.0f, 0.0f);
@@ -332,11 +331,10 @@ int main()
 			glUniform3f(glGetUniformLocation(lightingShader.Program, "light.ambient"), 0.0f, 0.0f, 0.0f);
 			glUniform3f(glGetUniformLocation(lightingShader.Program, "light.diffuse"), 0.0f, 0.0f, 0.0f);
 			glUniform3f(glGetUniformLocation(lightingShader.Program, "light.specular"), 0.0f, 0.0f, 0.0f);
-
-			//noche - luz de luna llena más visible y azulada
-			glUniform3f(glGetUniformLocation(lightingShader.Program, "newlight.ambient"), 0.5f, 0.5f, 0.8f);   // Luz ambiental azulada
-			glUniform3f(glGetUniformLocation(lightingShader.Program, "newlight.diffuse"), 1.2f, 1.2f, 1.8f);   // Luz difusa lunar más azulada
-			glUniform3f(glGetUniformLocation(lightingShader.Program, "newlight.specular"), 1.5f, 1.5f, 1.8f);  // Reflexión lunar más pronunciada
+			//noche - luz de luna plateada-azulada
+			glUniform3f(glGetUniformLocation(lightingShader.Program, "newlight.ambient"), 0.05f, 0.05f, 0.08f);   // Luz ambiental azulada muy tenue
+			glUniform3f(glGetUniformLocation(lightingShader.Program, "newlight.diffuse"), 0.3f, 0.3f, 0.45f);     // Luz difusa lunar azulada sutil
+			glUniform3f(glGetUniformLocation(lightingShader.Program, "newlight.specular"), 0.35f, 0.35f, 0.45f);   // Reflexión lunar azulada suave
 		}
 
 		// Directional light
@@ -483,19 +481,8 @@ int main()
 		glUniformMatrix4fv(glGetUniformLocation(lightingShader.Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
 		palmTree.Draw(lightingShader);
 
-		//glBindVertexArray(0);
-
-	
-		//model = glm::mat4(1);
-		//glEnable(GL_BLEND);//Avtiva la funcionalidad para trabajar el canal alfa
-		//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		//glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
-	 //   Dog.Draw(lightingShader);
-		//glDisable(GL_BLEND);  //Desactiva el canal alfa 
-		//glBindVertexArray(0);
-	
-
+		//glBindVertexArray(0);	
+		
 		// Also draw the lamp object, again binding the appropriate shader
 		lampShader.Use();
 		// Get location objects for the matrices on the lamp shader (these could be different on a different shader)
@@ -558,7 +545,6 @@ int main()
 		// For mushroom			
 		modelTemp2 = model = glm::translate(modelTemp2, glm::vec3(0.3f, 0.3f, -0.1f));
 		model = glm::scale(model, glm::vec3(0.1f));
-		//model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f)); //Rotación del foco
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		mushroom.Draw(lampShader);
 		
@@ -568,14 +554,17 @@ int main()
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		candle.Draw(lampShader);
 		
-		// For Moscow lamp			
+		// For lamp			
 		model = glm::translate(modelTemp, glm::vec3(2.0f, 0.1f, -2.0f));
 		model = glm::scale(model, glm::vec3(0.05f));
+		glEnable(GL_BLEND);//Avtiva la funcionalidad para trabajar el canal alfa
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 1);
+		glDisable(GL_BLEND);  //Desactiva el canal alfa 
 		lampE.Draw(lampShader);
 					
 		glBindVertexArray(0);
-
 
 		// Swap the screen buffers
 		glfwSwapBuffers(window);
