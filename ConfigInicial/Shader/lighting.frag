@@ -183,6 +183,8 @@ vec3 CalcSpotLight( SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir )
     
     return ( ambient + diffuse + specular );
 }
+
+// Calculates the color when using a basic light.
 vec3 CalcBasicLight(Light light, vec3 normal, vec3 fragPos, vec3 viewDir)
 {
     vec3 lightDir = normalize(light.position - fragPos);
