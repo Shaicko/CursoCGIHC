@@ -113,7 +113,6 @@ float vertices[] = {
 
 //Para el cambio de colores en las luces 
 
-
 //Luz 1
 float R0 = 1.0f; float G0 = 0.5f; float B0 = 0.5;
 //Luz 2
@@ -325,7 +324,7 @@ int main()
 		glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[0].position"), pointLightPositions[0].x, pointLightPositions[0].y, pointLightPositions[0].z);
 		glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[0].ambient"), lightColor.x, lightColor.y, lightColor.z);
 		glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[0].diffuse"), lightColor.x, lightColor.y, lightColor.z);
-		glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[0].specular"), R0, G0, B0); //Cambio de color en la luz 1
+		glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[0].specular"), R0, G0, B0); //Cambio de color en mushroom
 		//Nos ayudará a calcular la atenuación de la luz
 		glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[0].constant"), con);
 		glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[0].linear"), lin);
@@ -333,18 +332,18 @@ int main()
 
 		// Point light 2
 		glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[1].position"), pointLightPositions[1].x, pointLightPositions[1].y, pointLightPositions[1].z);
-		glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[1].ambient"), 0.05f, 0.05f, 0.05f); //Varia colores
-		glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[1].diffuse"), 0.05f, 0.05f, 0.05f);	 //varia colores
-		glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[1].specular"), R1, G1, B1);	//Cambio de color en la luz 2
+		glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[1].ambient"), 0.05f, 0.05f, 0.05f);
+		glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[1].diffuse"), 0.05f, 0.05f, 0.05f);
+		glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[1].specular"), R1, G1, B1); //Cambio de color en candle
 		glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[1].constant"), con);
 		glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[1].linear"), lin);
 		glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[1].quadratic"), qua);
 
 		// Point light 3
 		glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[2].position"), pointLightPositions[2].x, pointLightPositions[2].y, pointLightPositions[2].z);
-		glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[2].ambient"), lightColor.x, lightColor.y, lightColor.z);
-		glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[2].diffuse"), lightColor.x, lightColor.y, lightColor.z);
-		glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[2].specular"), R2, G2, B2); //Cambio de color luz 3
+		glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[2].ambient"), 0.0f, 0.0f, 0.0f);
+		glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[2].diffuse"), 0.0f, 0.0f, 0.0f);
+		glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[2].specular"), R2, G2, B2); //Cambio de color en lamp
 		glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[2].constant"), con);
 		glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[2].linear"), lin);
 		glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[2].quadratic"), qua);
@@ -467,58 +466,26 @@ int main()
 		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 
 		// Draw the light object (using light's vertex attributes)
-			// For mushroom			
-			modelTemp2 = model = glm::translate(modelTemp2, glm::vec3(0.3f, 0.3f, -0.1f));
-			model = glm::scale(model, glm::vec3(0.1f));
-			//model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f)); //Rotación del foco
-			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-			mushroom.Draw(lampShader);
+		// For mushroom			
+		modelTemp2 = model = glm::translate(modelTemp2, glm::vec3(0.3f, 0.3f, -0.1f));
+		model = glm::scale(model, glm::vec3(0.1f));
+		//model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f)); //Rotación del foco
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		mushroom.Draw(lampShader);
 		
-			// For candle			
-			modelTemp = model = glm::translate(modelTemp2, glm::vec3(-3.1f, -0.43f, -0.42f));
-			model = glm::scale(model, glm::vec3(0.1f));
-			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-			candle.Draw(lampShader);
+		// For candle			
+		modelTemp = model = glm::translate(modelTemp2, glm::vec3(-3.1f, -0.43f, -0.42f));
+		model = glm::scale(model, glm::vec3(0.1f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		candle.Draw(lampShader);
 		
-			// For Moscow lamp			
-			model = glm::translate(modelTemp, glm::vec3(2.0f, 0.1f, -2.0f));
-			model = glm::scale(model, glm::vec3(0.05f));
-			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-			lampE.Draw(lampShader);
-
-			// Dibuja cubos blancos en las posiciones de las luces para facilitar su visualización
-			glBindVertexArray(VAO); // Usa el VAO que ya tienes para los vértices del cubo
-
-			// Configura un shader básico para dibujar los cubos con un color sólido
-			lightingShader.Use();
-
-			// Para el cubo de la luz 1 (Mushroom)
-			model = glm::mat4(1);
-			model = glm::translate(model, pointLightPositions[0]);
-			model = glm::scale(model, glm::vec3(0.2f)); // Escala pequeña pero visible
-			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-			// Establece un color blanco brillante para el cubo
-			glUniform3f(glGetUniformLocation(lightingShader.Program, "light.ambient"), 1.0f, 1.0f, 1.0f);
-			glUniform3f(glGetUniformLocation(lightingShader.Program, "light.diffuse"), 1.0f, 1.0f, 1.0f);
-			glUniform3f(glGetUniformLocation(lightingShader.Program, "light.specular"), 1.0f, 1.0f, 1.0f);
-			glDrawArrays(GL_TRIANGLES, 0, 36);
-
-			// Para el cubo de la luz 2 (Candle)
-			model = glm::mat4(1);
-			model = glm::translate(model, pointLightPositions[1]);
-			model = glm::scale(model, glm::vec3(0.2f));
-			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-			glDrawArrays(GL_TRIANGLES, 0, 36);
-
-			// Para el cubo de la luz 3 (Lamp)
-			model = glm::mat4(1);
-			model = glm::translate(model, pointLightPositions[2]);
-			model = glm::scale(model, glm::vec3(0.2f));
-			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-			glDrawArrays(GL_TRIANGLES, 0, 36);
-		
+		// For Moscow lamp			
+		model = glm::translate(modelTemp, glm::vec3(2.0f, 0.1f, -2.0f));
+		model = glm::scale(model, glm::vec3(0.05f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		lampE.Draw(lampShader);
+					
 		glBindVertexArray(0);
-
 
 
 		// Swap the screen buffers
@@ -589,33 +556,7 @@ void DoMovement()
 			sunRotate = 0.0f;
 		}
 	}
-	if (keys[GLFW_KEY_Q])
-	{
-		pointLightPositions[1].x += 0.01f;
-	}
-	if (keys[GLFW_KEY_E])
-	{
-		pointLightPositions[1].x -= 0.01f;
-	}
-
-	if (keys[GLFW_KEY_P])
-	{
-		pointLightPositions[1].y += 0.01f;
-	}
-
-	if (keys[GLFW_KEY_M])
-	{
-		pointLightPositions[1].y -= 0.01f;
-	}
-	if (keys[GLFW_KEY_J])
-	{
-		pointLightPositions[1].z -= 0.01f;
-	}
-	if (keys[GLFW_KEY_K])
-	{
-		pointLightPositions[1].z += 0.01f;
-	}
-	// Cambios para Point light 1 - Focos
+	// Cambios para Point light 1 - Hongo
 	if (keys[GLFW_KEY_Z]) {
 		R0 += 0.01f;
 		if (R0 > 5.0f) R0 = 5.0f;
@@ -641,8 +582,7 @@ void DoMovement()
 		if (B0 < 0.0f) B0 = 0.0f;
 	}
 
-
-	//Cambios para Point light 2 - Faro
+	//Cambios para Point light 2 - Vela
 	if (keys[GLFW_KEY_R]) {
 		R1 += 0.01f;
 		if (R1 > 5.0f) R1 = 5.0f;
@@ -667,8 +607,8 @@ void DoMovement()
 		B1 -= 0.01f;
 		if (B1 < 0.0f) B1 = 0.0f;
 	}
-	//Cambios para Point light 3 - Disco ballw
 
+	//Cambios para Point light 3 - Lámpara
 	if (keys[GLFW_KEY_7]) {
 		R2 += 0.01f;
 		if (R2 > 5.0f) R2 = 5.0f;
@@ -694,8 +634,7 @@ void DoMovement()
 		if (B2 < 0.0f) B2 = 0.0f;
 	}
 
-	//Cambios para Directional light
-
+	//Cambios para la intensidad de las luces
 	if (keys[GLFW_KEY_1]) {
 		con += 0.01f;
 		if (con > 5.0f) con = 5.0f;
@@ -755,18 +694,18 @@ void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mode
 			Light1 = glm::vec3(0);//Cuado es solo un valor en los 3 vectores pueden dejar solo una componente
 		}
 	}
-	////Botón J y K para cambiar entre día y noche
-	//if (keys[GLFW_KEY_J])
-	//{
-	//	night = true;
-	//	day = false;
-	//}
+	//Botón J y K para cambiar entre día y noche
+	if (keys[GLFW_KEY_J])
+	{
+		night = true;
+		day = false;
+	}
 
-	//if (keys[GLFW_KEY_K])
-	//{
-	//	night = false;
-	//	day = true;
-	//}
+	if (keys[GLFW_KEY_K])
+	{
+		night = false;
+		day = true;
+	}
 }
 
 void MouseCallback(GLFWwindow *window, double xPos, double yPos)
