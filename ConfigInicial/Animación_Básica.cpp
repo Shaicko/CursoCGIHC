@@ -325,7 +325,6 @@ int main()
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 		model = glm::translate(model, glm::vec3(xDog, yDog, zDog));//Traslación del perro en la trayectorioa circular
-		//se aplica la rotación con la variable que será afectada por la animacion 
 		model = glm::rotate(model, angle, glm::vec3(0.0f, 1.0f, 0.0f));//Rotación del perro de acuerdo con su posición en la trayectoria circular
 		//se manda al shader para verse reflejado en el modelo 
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
@@ -337,10 +336,8 @@ int main()
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 1);
-
 		//model = glm::translate(model, glm::vec3(0.0f, ballY, 0.0f)); // Traslación para mover la pelota en el eje Y
-		//model = glm::rotate(model, glm::radians(rotBall), glm::vec3(0.0f, 1.0f, 0.0f)); // Rotación de la pelota
-		
+		//model = glm::rotate(model, glm::radians(rotBall), glm::vec3(0.0f, 1.0f, 0.0f)); // Rotación de la pelota		
 		model = glm::translate(model, glm::vec3(xBall, yBall, zBall));//Se mueve la pelota según su posición
 		model = glm::rotate(model, angleBall, glm::vec3(0.0f, 1.0f, 0.0f));//Rotación de la pelota de acuerdo con su posición en la trayectoria circular
 		//Se aplica la animación de la pelota mandandolo al shader
@@ -485,12 +482,14 @@ void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mode
 			Light1 = glm::vec3(0);//Cuado es solo un valor en los 3 vectores pueden dejar solo una componente
 		}
 	}
-	//activa la animación de la pelota en rotación
+	//activa la animación
 	if (keys[GLFW_KEY_N])
 	{
 		AnimBall = !AnimBall;
 		AnimDog = !AnimDog;
-		salto = false; //Deteniene el salto en progreso
+		salto = false; //Detiene el salto en progreso
+		yDog = 0.0f;
+		yBall = 0.0f;
 	}
 	//// Activar la animación de la pelota
 	//if (key == GLFW_KEY_M) {
