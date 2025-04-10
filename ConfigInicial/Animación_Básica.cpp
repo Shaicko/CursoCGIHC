@@ -1,7 +1,7 @@
 /*
 Práctica 10: Animación Básica
 Leonardo Ariel Berdejo Guzmán
-6 abril 2025
+10 abril 2025
 318034320
 */
 #include <iostream>
@@ -106,16 +106,37 @@ float vertices[] = {
 
 glm::vec3 Light1 = glm::vec3(0);
 
-// Variables para la animación de la pelota - ACT PREVIA
-float ballY = 0.0f;         // Posición actual en Y de la pelota
-bool ballUp = true;   // Indica si la pelota está subiendo o bajando
-float ballVel = 0.5f;    // Velocidad de la animación de la pelota
-bool AnimBallUp = false;    // Controla si la animación de subir está activa
- 
- 
-//Anim
-float rotBall = 0;
+//// Variables para la animación de la pelota - ACT PREVIA
+//float ballY = 0.0f;         // Posición actual en Y de la pelota
+//bool ballUp = true;   // Indica si la pelota está subiendo o bajando
+//float ballVel = 0.5f;    // Velocidad de la animación de la pelota
+//bool AnimBallUp = false;    // Controla si la animación de subir está activa
+
+//Variables para PRÁCTICA 10
+//Variables auxiliares para inicializar al perro y pelota en distintas posiciones
+float iniDog = 0.0f;
+float iniBall = 0.0f;
+
+//Valiables para el calculo de posición de la pelota en la trayectoria circular
+float xBall = 1.0f;
+float zBall = 1.0f;
+float yBall = 0.0f;
+float rotBall = iniBall;
 bool AnimBall = false;
+
+//Variables para el calculo de posición del perro en la trayectoria circular
+float xDog = -1.0f;
+float zDog = -1.0f;
+float yDog = 0.0f;
+float rotDog = iniDog;
+bool AnimDog = false;
+float angle = 0.0f;
+float angleBall = 0.0f;
+
+//Variables para el rebote de la pelota pelota
+bool salto = false;   // Controla si están en el aire
+bool subiendo = true; // Controla si están subiendo o bajando
+float saltoVel = 1.2f; // Velocidad del salto
 
 
 // Deltatime
@@ -299,18 +320,29 @@ int main()
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		Piso.Draw(lightingShader);
 
+		//Modelo perro
 		model = glm::mat4(1);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
+		model = glm::translate(model, glm::vec3(xDog, yDog, zDog));//Traslación del perro en la trayectorioa circular
+		//se aplica la rotación con la variable que será afectada por la animacion 
+		model = glm::rotate(model, angle, glm::vec3(0.0f, 1.0f, 0.0f));//Rotación del perro de acuerdo con su posición en la trayectoria circular
+		//se manda al shader para verse reflejado en el modelo 
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		Dog.Draw(lightingShader);
 
+		//Modelos de la pelota
 		model = glm::mat4(1);
 		glEnable(GL_BLEND);//Avtiva la funcionalidad para trabajar el canal alfa
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 1);
-		model = glm::translate(model, glm::vec3(0.0f, ballY, 0.0f)); // Traslación para mover la pelota en el eje Y
-		model = glm::rotate(model, glm::radians(rotBall), glm::vec3(0.0f, 1.0f, 0.0f)); // Rotación de la pelota
+
+		//model = glm::translate(model, glm::vec3(0.0f, ballY, 0.0f)); // Traslación para mover la pelota en el eje Y
+		//model = glm::rotate(model, glm::radians(rotBall), glm::vec3(0.0f, 1.0f, 0.0f)); // Rotación de la pelota
+		
+		model = glm::translate(model, glm::vec3(xBall, yBall, zBall));//Se mueve la pelota según su posición
+		model = glm::rotate(model, angleBall, glm::vec3(0.0f, 1.0f, 0.0f));//Rotación de la pelota de acuerdo con su posición en la trayectoria circular
 		//Se aplica la animación de la pelota mandandolo al shader
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 	    Ball.Draw(lightingShader); 
@@ -439,6 +471,7 @@ void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mode
 		}
 	}
 
+	// Activar/desactivar la luz
 	if (keys[GLFW_KEY_SPACE])
 	{
 		active = !active;
@@ -452,43 +485,108 @@ void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mode
 			Light1 = glm::vec3(0);//Cuado es solo un valor en los 3 vectores pueden dejar solo una componente
 		}
 	}
+	//activa la animación de la pelota en rotación
 	if (keys[GLFW_KEY_N])
 	{
 		AnimBall = !AnimBall;
-		
+		AnimDog = !AnimDog;
+		salto = false; //Deteniene el salto en progreso
 	}
-	// Activar la animación de la pelota
-	if (key == GLFW_KEY_M) {
-		AnimBallUp = true;  // Iniciar la animación de subir la pelota
-		ballUp = true; //Asegura que la pelota esta subiendo
-	}
+	//// Activar la animación de la pelota
+	//if (key == GLFW_KEY_M) {
+	//	AnimBallUp = true;  // Iniciar la animación de subir la pelota
+	//	ballUp = true; //Asegura que la pelota esta subiendo
+	//}
 }
 void Animation() {
-	if (AnimBallUp)
+	//////////////// ACT PREVIA /////////////////
+	//if (AnimBallUp)
+	//{
+	//	if (ballUp) {
+	//		ballY += ballVel * deltaTime; // Aumentar la posición Y de la pelota
+	//		if (ballY >= 1.7f) { // Si la pelota alcanza la altura máxima
+	//			ballUp = false; // Cambiar a bajar
+	//		}
+	//	}
+	//	else {
+	//		ballY -= ballVel * deltaTime; // Disminuir la posición Y de la pelota
+	//		if (ballY <= 0.0f) { // Si la pelota vuelve a su posición inicial
+	//			ballUp = true; // Cambiar a subir
+	//			AnimBallUp = false; // Detener la animación
+	//		}
+	//	}
+	//}
+	//// Actualizar la posición de la pelota
+	//if (AnimBall)
+	//{
+	//	rotBall += 0.2f;
+	//	printf("%f", rotBall);
+	//}
+	//else
+	//{
+	//	//rotBall = 0.0f;
+	//}
+
+	//////////////// PRÁCTICA 10 /////////////////
+
+	//Animación de la rotación de la pelota
+	if (AnimBall)
 	{
-		if (ballUp) {
-			ballY += ballVel * deltaTime; // Aumentar la posición Y de la pelota
-			if (ballY >= 1.7f) { // Si la pelota alcanza la altura máxima
-				ballUp = false; // Cambiar a bajar
+		rotBall -= 0.002f;
+		if (rotBall < -2 * 3.14f) rotBall += 2 * 3.14f; //se asegura de que el ángulo sea correcto
+
+		//printf("%f", rotBall);
+	}
+
+	//Calculo de posición de la pelota en la trayectoria circular
+	xBall = 1.6f * cos(rotBall);
+	zBall = 1.6f * sin(rotBall);
+
+	angleBall = atan2(-sin(rotBall), cos(rotBall));  // Ángulo tangente a la trayectoria circular
+
+	//Animación de la rotación del perro 
+	if (AnimDog)
+	{
+		rotDog += 0.002f;
+		if (rotDog > 2 * 3.14f) rotDog -= 2 * 3.14f; //se asegura de que el ángulo sea correcto
+
+		/*printf("%f", rotDog);*/
+	}
+
+	//Calculo de posición del perro en la trayectoria circular
+	xDog = 1.6f * cos(rotDog);
+	zDog = 1.6f * sin(rotDog);
+
+	angle = atan2(-sin(rotDog), cos(rotDog));  // Ángulo tangente a la trayectoria circular
+
+	//Animación del salto de perro y rebote de pelota
+
+	if (AnimDog) {
+		//Detecta cuando xBall = xDog y zBall = zDog para generar el salto
+		if (abs(xDog - xBall) < 0.1f && abs(zDog - zBall) < 0.1f && !salto) {
+			salto = true;
+			subiendo = true;
+		}
+	}
+
+	//Logica del salto
+	if (salto) {
+		if (subiendo) {
+			yDog += saltoVel * deltaTime;
+			yBall += saltoVel * deltaTime;
+			if (yDog >= 0.5f) {  // Altura del salto
+				subiendo = false;  // Empieza a bajar
 			}
 		}
 		else {
-			ballY -= ballVel * deltaTime; // Disminuir la posición Y de la pelota
-			if (ballY <= 0.0f) { // Si la pelota vuelve a su posición inicial
-				ballUp = true; // Cambiar a subir
-				AnimBallUp = false; // Detener la animación
+			yDog -= saltoVel * deltaTime;
+			yBall -= saltoVel * deltaTime;
+			if (yDog <= 0.0f) {  // Aterrizan
+				yDog = 0.0f;
+				yBall = 0.0f;
+				salto = false;  // Termina el salto
 			}
 		}
-	}
-	// Actualizar la posición de la pelota
-	if (AnimBall)
-	{
-		rotBall += 0.2f;
-		printf("%f", rotBall);
-	}
-	else
-	{
-		//rotBall = 0.0f;
 	}
 }
 
