@@ -1,7 +1,7 @@
 /*
 Práctica 11: Animación con Máquina de Estados
 Leonardo Ariel Berdejo Guzmán
-13 abril 2025
+21 abril 2025
 318034320
 */
 #include <iostream>
@@ -109,7 +109,6 @@ glm::vec3 Light1 = glm::vec3(0);
 float rotBall = 0.0f;
 bool AnimBall = false;
 bool AnimDog = false;
-float rotDog = 0.0f;
 int dogAnim = 0;
 float FLegs = 0.0f;
 float RLegs = 0.0f;
@@ -118,6 +117,12 @@ float tail = 0.0f;
 glm::vec3 dogPos (0.0f,0.0f,0.0f);
 float dogRot = 0.0f;
 bool step = false;
+int stage = 0; //Estado del recorrido
+//Variables para la rotación del cuerpo
+float tagRot = 0.0f;
+float rotDog = 0.0f;
+float angleDiff = 0.0f;
+bool DogR = false;
 
 
 
@@ -507,7 +512,7 @@ void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mode
 	}
 	if (keys[GLFW_KEY_B])
 	{
-		dogAnim = 1;
+		AnimDog = !AnimDog; //para activar o desactivar la animación
 
 	}
 	
@@ -516,17 +521,74 @@ void Animation() {
 	if (AnimBall)
 	{
 		rotBall += 0.4f;
-		//printf("%f", rotBall);
+		printf("%f", rotBall);
 	}
 	
 	if (AnimDog)
 	{
 		rotDog -= 0.6f;
-		//printf("%f", rotBall);
+		printf("%f", rotBall);
 	}
-	
-	if (dogAnim == 1)  //Walk animation
-	{
+
+	if (AnimDog) { //Inicio de animación
+
+		//Ciclo para generar las condicones de cada segmento del recorrido
+		switch (stage) {
+
+		case 0:  // Primer segmento: camina hacia en frente
+			dogPos.z += 0.001;
+			if (dogPos.z >= 2.0f) {  // Limitar posición en z
+				stage = 1;  // Cambiar al siguiente segmento
+				tagRot = 90.0f; //rotación de 90°
+				DogR = true; //verifica que se encuentra rotando
+			}
+			break;
+
+		case 1:  // Segundo segmento: camina hacia la derecha
+			dogPos.x += 0.001;
+			if (dogPos.x >= 1.8f) {  // Limitar posición en x
+				stage = 2;  // Cambiar al siguiente segmento
+				tagRot = 180.0f; //rotación 90° + 90° nuevos = 180°
+				DogR = true; //verifica que se encuentra rotando
+			}
+			break;
+
+		case 2:  // Tercer segmento: camina hacia atrás 
+			dogPos.z -= 0.001;
+			if (dogPos.z <= -1.5f) {  // Limitar posición en z
+				stage = 3;  // cambia al siguiente segmento	
+				tagRot = 315.0f; //rotación 180° + 135° = 315°
+				DogR = true; //verifica que se encuentra rotando
+			}
+			break;
+
+		case 3:
+			dogPos.x -= 0.001;
+			dogPos.z += 0.001;
+			if (dogPos.x <= 0.0f && dogPos.z >= 0.0f) {  // Limitar posición en x y z
+				stage = 0;  // Cambiar al segmento inicial
+				tagRot = 0.0f; // rotación para regresar a la posición inicial
+				DogR = true; //verifica que se encuentra rotando
+			}
+			break;
+		}
+
+		// Animación de rotación del perro
+		if (DogR) {
+			angleDiff = tagRot - dogRot;
+			// Normaliza la diferencia para que esté en el rango [-180, 180]
+			while (angleDiff > 180.0f) angleDiff -= 360.0f;
+			while (angleDiff < -180.0f) angleDiff += 360.0f;
+			// Aplica un porcentaje de la diferencia
+			dogRot += angleDiff * 0.05f;
+
+			// Comprobación de finalización de rotación
+			if (abs(dogRot - tagRot) < 0.01f) {  // Si la rotación está cerca del amgulo objetivo
+				dogRot = tagRot;  // Asegurar rotación
+				DogR = false;  // Finalizar rotación
+			}
+		}
+
 		if (!step) //State 1
 		{
 			RLegs += 0.3f;
@@ -545,8 +607,6 @@ void Animation() {
 			if (RLegs < -15.0f) //Condition
 				step = false;
 		}
-		if (dogPos.z < 2.0f) //Condition 3: Pause before the end of the floor
-			dogPos.z += 0.001f;
 	}
 }
 
