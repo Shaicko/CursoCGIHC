@@ -512,7 +512,7 @@ void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mode
 	}
 	if (keys[GLFW_KEY_B])
 	{
-		AnimDog = !AnimDog; //para activar o desactivar la animación
+		AnimDog = !AnimDog;
 
 	}
 	
@@ -521,13 +521,13 @@ void Animation() {
 	if (AnimBall)
 	{
 		rotBall += 0.4f;
-		printf("%f", rotBall);
+		//printf("%f", rotBall);
 	}
 	
 	if (AnimDog)
 	{
 		rotDog -= 0.6f;
-		printf("%f", rotBall);
+		//printf("%f", rotBall);
 	}
 
 	if (AnimDog) { //Inicio de animación
@@ -584,7 +584,6 @@ void Animation() {
 
 			// Comprobación de finalización de rotación
 			if (abs(dogRot - tagRot) < 0.01f) {  // Si la rotación está cerca del amgulo objetivo
-				dogRot = tagRot;  // Asegurar rotación
 				DogR = false;  // Finalizar rotación
 			}
 		}
