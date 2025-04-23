@@ -1,7 +1,7 @@
 /*
 Práctica 12: Animación por KeyFrames
 Leonardo Ariel Berdejo Guzmán
-19 abril 2025
+22 abril 2025
 318034320
 */
 #include <iostream>
