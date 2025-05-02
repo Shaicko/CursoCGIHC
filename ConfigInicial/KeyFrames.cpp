@@ -1,6 +1,6 @@
-/*
-Pr·ctica 12: AnimaciÛn por KeyFrames
-Leonardo Ariel Berdejo Guzm·n
+Ôªø/*
+Pr√°ctica 12: Animaci√≥n por KeyFrames
+Leonardo Ariel Berdejo Guzm√°n
 22 abril 2025
 318034320
 */
@@ -29,6 +29,7 @@ Leonardo Ariel Berdejo Guzm·n
 #include "Shader.h"
 #include "Camera.h"
 #include "Model.h"
+#include "Texture.h"
 
 
 // Function prototypes
@@ -108,7 +109,7 @@ glm::vec3 Light1 = glm::vec3(0);
 //Anim
 float rotBall = 0.0f;
 float rotDog = 0.0f;
-float rotDogX = 0; //Variable para rotaciÛn
+float rotDogX = 0; //Variable para rotaci√≥n
 int dogAnim = 0;
 float FLegs = 0.0f;
 float FLegsL = 0.0f;
@@ -117,6 +118,10 @@ float RLegs = 0.0f;
 float head = 0.0f;
 float tail = 0.0f;
 
+float radio = 0.0f;  // Radio del c√≠rculo
+float angle = 0.0f;  // √Ångulo inicial
+bool moveRot = false;
+float speed = 0.0001f;
 
 
 //KeyFrames
@@ -124,7 +129,7 @@ float dogPosX , dogPosY , dogPosZ  ;
 
 #define MAX_FRAMES 9
 int i_max_steps = 500;
-int i_curr_steps = 0;
+int i_curr_steps = 0; //En qu√© punto de la l√≠nea de tiempo nos encontramos
 typedef struct _frame {
 	
 	float rotDog;
@@ -147,7 +152,7 @@ typedef struct _frame {
 	float FLegsRInc;
 	float RLegs;
 	float RLegsInc;
-	//Variables para la rotaciÛn
+	//Variables para la rotaci√≥n
 	float rotDogX;
 	float rotDogXInc;
 
@@ -158,7 +163,7 @@ int FrameIndex = 0;			//introducir datos
 bool play = false;
 int playIndex = 0;
 
-// FunciÛn para guardar la animaciÛn
+// Funci√≥n para guardar la animaci√≥n
 void SaveAnimation(const char* filename = "Animacion.txt") {
 	std::ofstream file(filename);
 	if (!file.is_open()) {
@@ -183,7 +188,7 @@ void SaveAnimation(const char* filename = "Animacion.txt") {
 	std::cout << "Animacion guardada correctamente." << std::endl;
 }
 
-// FunciÛn para cargar los KeyFrames
+// Funci√≥n para cargar los KeyFrames
 void LoadAnimation(const char* filename = "Animacion.txt") {
 	std::ifstream file(filename);
 	if (!file.is_open()) {
@@ -208,7 +213,7 @@ void LoadAnimation(const char* filename = "Animacion.txt") {
 	}
 }
 
-// FunciÛn para imprimir el contenido del archivo .txt en consola
+// Funci√≥n para imprimir el contenido del archivo .txt en consola
 void PrintAnimation(const char* filename = "Animacion.txt") {
 	std::ifstream file(filename);
 	if (!file.is_open()) {
@@ -280,6 +285,7 @@ void interpolation(void)
 	KeyFrame[playIndex].rotDogInc = (KeyFrame[playIndex + 1].rotDog - KeyFrame[playIndex].rotDog) / i_max_steps;
 	KeyFrame[playIndex].rotDogXInc = (KeyFrame[playIndex + 1].rotDogX - KeyFrame[playIndex].rotDogX) / i_max_steps;
 
+	printf("Interpolando cuadro %d a %d: IncX = %f\n", playIndex, playIndex + 1, KeyFrame[playIndex].incX);
 }
 
 
@@ -337,6 +343,7 @@ int main()
 
 	Shader lightingShader("Shader/lighting.vs", "Shader/lighting.frag");
 	Shader lampShader("Shader/lamp.vs", "Shader/lamp.frag");
+	Shader skyboxshader("Shader/SkyBox.vs","Shader/SkyBox.frag");
 	
 	
 	//models
@@ -349,6 +356,7 @@ int main()
 	Model B_LeftLeg((char*)"Models/B_LeftLegDog.obj");
 	Model Piso((char*)"Models/piso.obj");
 	Model Ball((char*)"Models/ball.obj");
+	Model rack((char*)"Models/Rack.obj");
 
 
 	//KeyFrames
@@ -378,18 +386,82 @@ int main()
 		KeyFrame[i].headInc = 0;
 	}
 
+	GLfloat skyboxVertices[] = {
+		// Positions
+		-1.0f,  1.0f, -1.0f,
+		-1.0f, -1.0f, -1.0f,
+		1.0f, -1.0f, -1.0f,
+		1.0f, -1.0f, -1.0f,
+		1.0f,  1.0f, -1.0f,
+		-1.0f,  1.0f, -1.0f,
+
+		-1.0f, -1.0f,  1.0f,
+		-1.0f, -1.0f, -1.0f,
+		-1.0f,  1.0f, -1.0f,
+		-1.0f,  1.0f, -1.0f,
+		-1.0f,  1.0f,  1.0f,
+		-1.0f, -1.0f,  1.0f,
+
+		1.0f, -1.0f, -1.0f,
+		1.0f, -1.0f,  1.0f,
+		1.0f,  1.0f,  1.0f,
+		1.0f,  1.0f,  1.0f,
+		1.0f,  1.0f, -1.0f,
+		1.0f, -1.0f, -1.0f,
+
+		-1.0f, -1.0f,  1.0f,
+		-1.0f,  1.0f,  1.0f,
+		1.0f,  1.0f,  1.0f,
+		1.0f,  1.0f,  1.0f,
+		1.0f, -1.0f,  1.0f,
+		-1.0f, -1.0f,  1.0f,
+
+		-1.0f,  1.0f, -1.0f,
+		1.0f,  1.0f, -1.0f,
+		1.0f,  1.0f,  1.0f,
+		1.0f,  1.0f,  1.0f,
+		-1.0f,  1.0f,  1.0f,
+		-1.0f,  1.0f, -1.0f,
+
+		-1.0f, -1.0f, -1.0f,
+		-1.0f, -1.0f,  1.0f,
+		1.0f, -1.0f, -1.0f,
+		1.0f, -1.0f, -1.0f,
+		-1.0f, -1.0f,  1.0f,
+		1.0f, -1.0f,  1.0f
+	};
+
+
+	GLuint indices[] =
+	{  // Note that we start from 0!
+		0,1,2,3,
+		4,5,6,7,
+		8,9,10,11,
+		12,13,14,15,
+		16,17,18,19,
+		20,21,22,23,
+		24,25,26,27,
+		28,29,30,31,
+		32,33,34,35
+	};
+
 
 	// First, set the container's VAO (and VBO)
 	GLuint VBO, VAO,EBO;
 	glGenVertexArrays(1, &VAO);
-	glGenBuffers(1, &VBO);
-	
-
+	glGenBuffers(1, &VBO);	
+	///////////////////BUFFER SKYBOX//////////////////
+	glGenBuffers(1, &EBO);
+	/////////////////////////////////////////////////
 	glBindVertexArray(VAO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
+	///////////////////PIPELINE RENDERIZADO SKYBOX//////////////////
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+	///////////////////////////////////////////////////////////////
 	
+		
 	// Position attribute
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)0);
 	glEnableVertexAttribArray(0);
@@ -402,6 +474,27 @@ int main()
 	glUniform1i(glGetUniformLocation(lightingShader.Program, "Material.difuse"), 0);
 	glUniform1i(glGetUniformLocation(lightingShader.Program, "Material.specular"), 1);
 
+	///////////////////////////SKYBOX/////////////////////////
+		GLuint skyBoxVBO, skyBoxVAO;
+		glGenVertexArrays(1, &skyBoxVAO);
+		glGenBuffers(1, &skyBoxVBO);
+		glBindVertexArray(skyBoxVAO);
+		glBindBuffer(GL_ARRAY_BUFFER, skyBoxVBO);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), &skyboxVertices, GL_STATIC_DRAW);
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
+
+		//Load textures
+		vector < const GLchar*> faces;
+		faces.push_back("SkyBox/right.jpg");
+		faces.push_back("SkyBox/left.jpg");
+		faces.push_back("SkyBox/top.jpg");
+		faces.push_back("SkyBox/bottom.jpg");
+		faces.push_back("SkyBox/back.jpg");
+		faces.push_back("SkyBox/front.jpg");
+
+		GLuint cubemapTexture = TextureLoading::LoadCubemap(faces);
+	/////////////////////////////////////////////////////////
 	
 	glm::mat4 projection = glm::perspective(camera.GetZoom(), (GLfloat)SCREEN_WIDTH / (GLfloat)SCREEN_HEIGHT, 0.1f, 100.0f);
 
@@ -507,10 +600,11 @@ int main()
 		model = glm::mat4(1);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
+
 		//Body
 		modelTemp = model = glm::translate(model, glm::vec3(dogPosX, dogPosY, dogPosZ));
-		modelTemp = model = glm::rotate(model, glm::radians(rotDog), glm::vec3(0.0f, 1.0f, 0.0f)); //RotaciÛn en y
-		modelTemp = model = glm::rotate(model, glm::radians(rotDogX), glm::vec3(1.0f, 0.0f, 0.0f)); //RotaciÛn en x 
+		modelTemp = model = glm::rotate(model, glm::radians(rotDog), glm::vec3(0.0f, 1.0f, 0.0f)); //Rotaci√≥n en y
+		modelTemp = model = glm::rotate(model, glm::radians(rotDogX), glm::vec3(1.0f, 0.0f, 0.0f)); //Rotaci√≥n en x 
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		DogBody.Draw(lightingShader);
 		//Head
@@ -552,16 +646,27 @@ int main()
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		B_RightLeg.Draw(lightingShader); 
 
+		
 
-		model = glm::mat4(1);
+
 		glEnable(GL_BLEND);//Avtiva la funcionalidad para trabajar el canal alfa
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+
+		// Rack transparente
+		model = glm::mat4(1);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 1);
+		rack.Draw(lightingShader);
+
+		model = glm::mat4(1);
 		model = glm::rotate(model, glm::radians(rotBall), glm::vec3(0.0f, 1.0f, 0.0f));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 	    Ball.Draw(lightingShader); 
-		glDisable(GL_BLEND);  //Desactiva el canal alfa 
+
+		// Restaura configuraci√≥n normal
+		glDisable(GL_BLEND);
+
 		glBindVertexArray(0);
 	
 
@@ -590,13 +695,32 @@ int main()
 		
 		glBindVertexArray(0);
 
-		
-		// Swap the screen buffers
-		glfwSwapBuffers(window);
-	}
+		// Draw skybox as last
+		glDepthFunc(GL_LEQUAL); //hace que no interfiera con otros objetos //Funci√≥n de profundidad
+		skyboxshader.Use();
+		view = glm::mat4(glm::mat3(camera.GetViewMatrix()));
+		glUniformMatrix4fv(glGetUniformLocation(skyboxshader.Program, "view"), 1, GL_FALSE, glm::value_ptr(view));
+		glUniformMatrix4fv(glGetUniformLocation(skyboxshader.Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 
-	
-	
+		glBindVertexArray(skyBoxVAO);
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+		glBindVertexArray(0);
+		glDepthFunc(GL_LESS);
+
+
+		// Swap the buffers
+		glDeleteVertexArrays(1, &VAO);
+		glfwSwapBuffers(window);
+
+	}
+	/////////////////Borramos buffers/////////////////
+	glDeleteVertexArrays(1, &VAO);
+	glDeleteBuffers(1, &VBO);
+	glDeleteBuffers(1, &EBO);
+	glDeleteVertexArrays(1, &skyBoxVAO);
+	glDeleteBuffers(1, &skyBoxVAO);
 
 	// Terminate GLFW, clearing any resources allocated by GLFW.
 	glfwTerminate();
@@ -610,6 +734,19 @@ int main()
 void DoMovement()
 {
 	//Dog Controls
+	if (keys[GLFW_KEY_1])
+	{
+		angle += speed;  // Incrementa el √°ngulo para el movimiento circular
+		//dogPosX = radio * cos(angle); // Posici√≥n en X
+		//dogPosZ = radio * sin(angle); // Posici√≥n en Z
+		rotDog += 0.05f;
+		FLegs = 15.0f * sin(rotDog * 0.05f); // Mueve las patas delanteras
+		RLegs = 15.0f * sin(rotDog * 0.05f);  // Mueve las patas traseras
+		// Mantener circularAngle en el rango [0, 2œÄ]
+		if (angle > 2 * 3.15) {
+			angle -= 2 * 3.15;
+		}
+	}
 	
 	if (keys[GLFW_KEY_2]) rotDogX += 0.1f;
 	if (keys[GLFW_KEY_3]) rotDogX -= 0.1f;
@@ -729,13 +866,13 @@ void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mode
 	}
 
 	if (key == GLFW_KEY_Q && GLFW_PRESS == action) {
-		SaveAnimation();  // Guarda la animaciÛn en "Animacion.txt"
+		SaveAnimation();  // Guarda la animaci√≥n en "Animacion.txt"
 	}
 
 	if (key == GLFW_KEY_R && GLFW_PRESS == action) {
 
 		resetElements();  // Resetear los elementos a los primeros keyframes cargados
-		LoadAnimation(); //Carga la animaciÛn por medio del archivo previamente guardado
+		LoadAnimation(); //Carga la animaci√≥n por medio del archivo previamente guardado
 		PrintAnimation(); //Imprime en terminar los valores del archivo
 	}
 
