@@ -1,5 +1,5 @@
 ﻿/*
-Práctica 12: Animación por KeyFrames
+Práctica adicional: SkyBox
 Leonardo Ariel Berdejo Guzmán
 05 mayo 2025
 318034320
